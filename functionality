@@ -1,0 +1,72 @@
+import { useState } from "react";
+import { Box, Tabs, TabList, TabPanels, Tab, TabPanel, FormControl, FormLabel, Select, Input, Button, Textarea, useToast } from "@chakra-ui/react";
+import { FaSave } from "react-icons/fa";
+
+const Index = () => {
+  const [formData, setFormData] = useState({ class: "cat", name: "" });
+  const toast = useToast();
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const saveJsonToFile = () => {
+    const blob = new Blob([JSON.stringify(formData, null, 2)], { type: "application/json" });
+    const href = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = href;
+    link.download = "data.json";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(href);
+
+    toast({
+      title: "Success!",
+      description: "JSON file has been saved.",
+      status: "success",
+      duration: 2000,
+      isClosable: true,
+    });
+  };
+
+  return (
+    <Box p={5}>
+      <Tabs variant="soft-rounded" colorScheme="green">
+        <TabList>
+          <Tab>Form</Tab>
+          <Tab>JSON</Tab>
+        </TabList>
+
+        <TabPanels>
+          <TabPanel>
+            <FormControl id="class" mb={4}>
+              <FormLabel>Class</FormLabel>
+              <Select name="class" onChange={handleInputChange} value={formData.class}>
+                <option value="cat">Cat</option>
+                <option value="dog">Dog</option>
+              </Select>
+            </FormControl>
+
+            <FormControl id="name">
+              <FormLabel>Name</FormLabel>
+              <Input name="name" onChange={handleInputChange} value={formData.name} placeholder="Enter name" />
+            </FormControl>
+          </TabPanel>
+          <TabPanel>
+            <Textarea readOnly value={JSON.stringify(formData, null, 2)} h="200px" />
+            <Button leftIcon={<FaSave />} colorScheme="blue" mt={3} onClick={saveJsonToFile}>
+              Save JSON
+            </Button>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </Box>
+  );
+};
+
+export default Index;
